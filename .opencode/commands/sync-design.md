@@ -1,0 +1,5 @@
+---
+description: 同步技术方案文档 — 分析代码变更并更新 docs/design.md
+---
+
+使用 sync-design skill，分析代码变更并将变更同步到 docs/design.md 技术方案文档中。先执行 git diff 获取变更文件，按映射规则更新对应章节，完成后输出同步报告。

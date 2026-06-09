@@ -1,9 +1,16 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useUserStore } from '@/stores/user'
 
+const router = useRouter()
 const appStore = useAppStore()
 const userStore = useUserStore()
+
+async function handleLogout() {
+  await userStore.logout()
+  router.push('/login')
+}
 </script>
 
 <template>
@@ -18,11 +25,11 @@ const userStore = useUserStore()
       <el-dropdown>
         <span class="user-info">
           <el-avatar :size="32" />
-          <span class="username">{{ userStore.username || '管理员' }}</span>
+          <span class="username">{{ userStore.userInfo?.nickname || userStore.userInfo?.username || '管理员' }}</span>
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item @click="userStore.logout">退出登录</el-dropdown-item>
+            <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>

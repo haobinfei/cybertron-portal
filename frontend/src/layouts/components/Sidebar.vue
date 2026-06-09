@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
+const userStore = useUserStore()
 </script>
 
 <template>
@@ -20,13 +22,17 @@ const route = useRoute()
         <el-icon><Monitor /></el-icon>
         <span>仪表盘</span>
       </el-menu-item>
+      <el-menu-item v-if="userStore.isAdmin" index="/users">
+        <el-icon><User /></el-icon>
+        <span>用户管理</span>
+      </el-menu-item>
     </el-menu>
   </div>
 </template>
 
 <script lang="ts">
-import { Monitor } from '@element-plus/icons-vue'
-export default { components: { Monitor } }
+import { Monitor, User } from '@element-plus/icons-vue'
+export default { components: { Monitor, User } }
 </script>
 
 <style scoped>

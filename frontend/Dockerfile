@@ -6,6 +6,9 @@ FROM registry.cn-hangzhou.aliyuncs.com/ss-vip/node:20-alpine AS builder
 
 WORKDIR /app
 
+# 配置 npm 国内镜像源，解决 CI 构建时访问 npm registry 超时
+ENV NPM_CONFIG_REGISTRY=https://registry.npmmirror.com
+
 # 复制依赖文件并安装
 COPY package*.json ./
 RUN npm ci

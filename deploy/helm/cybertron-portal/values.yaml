@@ -1,0 +1,123 @@
+# Default values for cybertron-portal.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+
+# 全局镜像仓库前缀，示例：registry.cn-hangzhou.aliyuncs.com
+global:
+  imageRegistry: "registry.cn-hangzhou.aliyuncs.com"
+
+# 私有镜像拉取 Secret（引用已存在的 Secret）。
+# 若需 Helm 自动生成，请打开下面的 registry 配置。
+imagePullSecrets:
+  - name: aliyun-registry-secret
+
+# 自动生成 docker-registry Secret（默认关闭，建议由 CI 创建）。
+registry:
+  enabled: false
+  server: "registry.cn-hangzhou.aliyuncs.com"
+  username: ""
+  password: ""
+  email: ""
+
+backend:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    # 完整镜像路径 = global.imageRegistry / repository : tag
+    repository: ss-vip/cybertron-portal-backend
+    # 留空则使用 Chart.appVersion
+    tag: ""
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 8080
+
+  resources: {}
+    # limits:
+    #   cpu: 500m
+    #   memory: 256Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  env: []
+    # - name: EXAMPLE_VAR
+    #   value: "example"
+
+  # 是否将 backend/config/config.yaml 以 ConfigMap 形式挂载进容器
+  config:
+    enabled: true
+
+  database:
+    host: "192.168.101.1"
+    port: 5432
+    user: "postgres"
+    password: "123456"
+    dbname: "cybertron"
+    sslmode: "disable"
+
+  redis:
+    addr: "192.168.101.1:6379"
+    password: ""
+    db: 0
+
+  jwt:
+    secret: "cybertron-jwt-secret-key-2026"
+    expireHours: 24
+
+  serviceMonitor:
+    enabled: false
+    namespace: ""
+    labels: {}
+    annotations: {}
+    interval: 15s
+    path: /metrics
+
+frontend:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: ss-vip/cybertron-portal-frontend
+    tag: ""
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  resources: {}
+
+  env: []
+
+# 前端访问后端的 API 地址。
+# 如果走 Ingress 统一分发，前端无需关心；否则前端 nginx 会把 /api 代理到该地址。
+api:
+  baseUrl: "http://cybertron-portal-backend:8080"
+
+ingress:
+  enabled: false
+  className: nginx
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: cybertron-portal.local
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+          port: 80
+        - path: /api
+          pathType: Prefix
+          service: backend
+          port: 8080
+  tls: []
+    # - secretName: cybertron-portal-tls
+    #   hosts:
+    #     - cybertron-portal.local

@@ -1,0 +1,28 @@
+{{- if and .Values.backend.enabled .Values.backend.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "cybertron-portal.backend.fullname" . }}
+  labels:
+    app.kubernetes.io/component: backend
+    {{- include "cybertron-portal.labels" . | nindent 4 }}
+    {{- with .Values.backend.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.backend.serviceMonitor.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if .Values.backend.serviceMonitor.namespace }}
+  namespace: {{ .Values.backend.serviceMonitor.namespace }}
+  {{- end }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: backend
+      {{- include "cybertron-portal.selectorLabels" . | nindent 6 }}
+  endpoints:
+    - port: http
+      path: {{ .Values.backend.serviceMonitor.path }}
+      interval: {{ .Values.backend.serviceMonitor.interval }}
+{{- end }}

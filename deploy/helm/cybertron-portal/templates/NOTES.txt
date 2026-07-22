@@ -1,0 +1,34 @@
+Cybertron Portal 已部署到 {{ .Release.Namespace }} 命名空间。
+
+服务访问方式：
+
+1. 前端：
+{{- if .Values.ingress.enabled }}
+{{- range .Values.ingress.hosts }}
+   - http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}
+{{- end }}
+{{- else }}
+   kubectl port-forward svc/{{ include "cybertron-portal.frontend.fullname" . }} 8081:{{ .Values.frontend.service.port }}
+   # 然后访问 http://localhost:8081
+{{- end }}
+
+2. 后端 API：
+{{- if .Values.ingress.enabled }}
+{{- range .Values.ingress.hosts }}
+   - http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}/api
+{{- end }}
+{{- else }}
+   kubectl port-forward svc/{{ include "cybertron-portal.backend.fullname" . }} 8082:{{ .Values.backend.service.port }}
+   # 然后访问 http://localhost:8082
+{{- end }}
+
+{{- if not .Values.registry.enabled }}
+注意：私有镜像拉取 Secret 未由 Helm 生成，请确保已创建：
+  kubectl get secret {{ (index .Values.imagePullSecrets 0).name | default "aliyun-registry-secret" }} -n {{ .Release.Namespace }}
+{{- end }}
+
+{{- if .Values.backend.serviceMonitor.enabled }}
+监控：
+- ServiceMonitor 已启用，Prometheus 会自动抓取后端 /metrics。
+- 后端指标地址：http://{{ include "cybertron-portal.backend.fullname" . }}:{{ .Values.backend.service.port }}/metrics
+{{- end }}

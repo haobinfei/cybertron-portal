@@ -1,0 +1,6 @@
+apiVersion: v2
+name: cybertron-portal
+description: A Helm chart for Cybertron Portal (backend + frontend)
+type: application
+version: 0.1.0
+appVersion: "latest"

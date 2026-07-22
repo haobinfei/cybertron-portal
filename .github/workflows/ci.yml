@@ -1,0 +1,207 @@
+name: CI - Build and Push Images
+
+# 触发条件：push 到 main/master 分支、打 tag、PR 到 main/master
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+      - master
+
+env:
+  # 阿里云镜像仓库地址
+  REGISTRY: registry.cn-hangzhou.aliyuncs.com
+  # 命名空间
+  NAMESPACE: ss-vip
+  # 镜像名称
+  BACKEND_IMAGE: cybertron-portal-backend
+  FRONTEND_IMAGE: cybertron-portal-frontend
+  # Helm Chart 仓库地址
+  HELM_REPO_URL: http://package.ss-vip.cn/repository/helm
+  # Helm Chart 名称与路径
+  HELM_CHART_NAME: cybertron-portal
+  HELM_CHART_PATH: deploy/helm/cybertron-portal
+
+jobs:
+  # ------------------------------
+  # 后端镜像构建与推送
+  # ------------------------------
+  build-backend:
+    name: Build Backend Image
+    # 在 Actions Runner Controller (ARC) 提供的 runner 上执行
+    # 请根据你的 ARC RunnerDeployment 标签调整，例如：runs-on: [self-hosted, linux, x64]
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Aliyun Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
+          password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
+
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.BACKEND_IMAGE }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=,suffix=,format=short
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ------------------------------
+  # 前端镜像构建与推送
+  # ------------------------------
+  build-frontend:
+    name: Build Frontend Image
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Aliyun Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
+          password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
+
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.FRONTEND_IMAGE }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=,suffix=,format=short
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ------------------------------
+  # Helm Chart 打包与推送
+  # ------------------------------
+  package-helm-chart:
+    name: Package and Push Helm Chart
+    runs-on: self-hosted
+    needs: [build-backend, build-frontend]
+    if: github.event_name != 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: 'v3.14.0'
+
+      - name: Determine chart version
+        id: chart
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            # tag: v1.2.3 -> 1.2.3
+            VERSION="${{ github.ref_name }}"
+            VERSION="${VERSION#v}"
+          else
+            # branch: use 8-char commit sha
+            VERSION="${GITHUB_SHA:0:8}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Package Helm Chart
+        run: |
+          helm package ${{ env.HELM_CHART_PATH }} \
+            --version "${{ steps.chart.outputs.version }}" \
+            --app-version "${{ steps.chart.outputs.version }}"
+
+      - name: Push Helm Chart to Nexus
+        env:
+          NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+        run: |
+          CHART_TGZ="${{ env.HELM_CHART_NAME }}-${{ steps.chart.outputs.version }}.tgz"
+          curl -f -u "${NEXUS_USERNAME}:${NEXUS_PASSWORD}" \
+            --upload-file "${CHART_TGZ}" \
+            "${{ env.HELM_REPO_URL }}/${CHART_TGZ}"
+
+  # ------------------------------
+  # 可选：在 K8s 集群中创建/更新 imagePullSecret
+  # 需要先在仓库 Settings -> Secrets and variables -> Actions 中配置 KUBECONFIG
+  # ------------------------------
+  create-image-pull-secret:
+    name: Create Image Pull Secret
+    runs-on: self-hosted
+    needs: [build-backend, build-frontend]
+    if: github.event_name != 'pull_request'
+    steps:
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+
+      - name: Configure kubeconfig
+        env:
+          KUBECONFIG_DATA: ${{ secrets.KUBECONFIG }}
+        run: |
+          if [ -z "$KUBECONFIG_DATA" ]; then
+            echo "KUBECONFIG secret not set, skipping imagePullSecret creation."
+            exit 0
+          fi
+          mkdir -p $HOME/.kube
+          echo "$KUBECONFIG_DATA" | base64 -d > $HOME/.kube/config
+
+      - name: Create imagePullSecret in Kubernetes
+        env:
+          KUBECONFIG_DATA: ${{ secrets.KUBECONFIG }}
+        run: |
+          if [ -z "$KUBECONFIG_DATA" ]; then
+            echo "KUBECONFIG secret not set, skipping imagePullSecret creation."
+            exit 0
+          fi
+          kubectl create secret docker-registry aliyun-registry-secret \
+            --docker-server=${{ env.REGISTRY }} \
+            --docker-username=${{ secrets.ALIYUN_REGISTRY_USERNAME }} \
+            --docker-password=${{ secrets.ALIYUN_REGISTRY_PASSWORD }} \
+            --namespace=default \
+            --dry-run=client -o yaml | kubectl apply -f -
+          echo "imagePullSecret 'aliyun-registry-secret' created/updated in namespace 'default'"

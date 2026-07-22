@@ -6,6 +6,7 @@ import (
 	"cybertron-portal/internal/service"
 
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func SetupRouter(
@@ -16,6 +17,10 @@ func SetupRouter(
 	r := gin.Default()
 
 	r.Use(middleware.CORSMiddleware())
+	r.Use(middleware.MetricsMiddleware())
+
+	// Prometheus metrics endpoint (no auth required)
+	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	api := r.Group("/api")
 	{

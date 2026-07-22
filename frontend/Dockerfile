@@ -10,8 +10,10 @@ WORKDIR /app
 ENV NPM_CONFIG_REGISTRY=https://registry.npmmirror.com
 
 # 复制依赖文件并安装
+# --include=dev：强制安装 devDependencies（vue-tsc 等构建工具），
+# 防止基础镜像携带 NODE_ENV=production 导致 npm ci 跳过 dev 依赖
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --include=dev
 
 # 复制源码并构建
 COPY . .

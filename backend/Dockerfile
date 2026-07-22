@@ -2,7 +2,7 @@
 # 多阶段构建：编译 Go 后端服务
 
 # 阶段 1：编译
-FROM golang:1.25-alpine AS builder
+FROM registry.cn-hangzhou.aliyuncs.com/ss-vip/golang:1.25-alpine AS builder
 
 WORKDIR /app
 
@@ -17,7 +17,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o server ./cmd/server
 
 # 阶段 2：运行（最小镜像）
-FROM alpine:latest
+FROM registry.cn-hangzhou.aliyuncs.com/ss-vip/alpine:latest
 
 WORKDIR /app
 

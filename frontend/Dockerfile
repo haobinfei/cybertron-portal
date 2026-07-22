@@ -2,7 +2,7 @@
 # 多阶段构建：先编译 Vue/Vite 前端，再用 nginx 托管
 
 # 阶段 1：编译
-FROM node:20-alpine AS builder
+FROM registry.cn-hangzhou.aliyuncs.com/ss-vip/node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ COPY . .
 RUN npm run build
 
 # 阶段 2：运行（nginx 托管静态资源）
-FROM nginx:alpine
+FROM registry.cn-hangzhou.aliyuncs.com/ss-vip/nginx:alpine
 
 # 复制构建产物
 COPY --from=builder /app/dist /usr/share/nginx/html

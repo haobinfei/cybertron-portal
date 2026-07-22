@@ -106,6 +106,13 @@ ingress:
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
+  # cert-manager 集成：自动签发 TLS 证书
+  certManager:
+    enabled: false
+    # ClusterIssuer 名称，如 letsencrypt-prod / letsencrypt-staging
+    clusterIssuer: ""
+    # 签发成功后证书存放的 Secret 名称
+    secretName: cybertron-portal-tls
   hosts:
     - host: cybertron-portal.local
       paths:

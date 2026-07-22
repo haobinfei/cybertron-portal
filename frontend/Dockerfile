@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1
 # frontend/Dockerfile
 # 多阶段构建：先编译 Vue/Vite 前端，再用 nginx 托管
 

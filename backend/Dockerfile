@@ -6,6 +6,9 @@ FROM registry.cn-hangzhou.aliyuncs.com/ss-vip/golang:1.25-alpine AS builder
 
 WORKDIR /app
 
+# 配置 Go 代理，解决国内网络访问 proxy.golang.org 超时
+ENV GOPROXY=https://goproxy.cn,direct
+
 # 先复制依赖文件并下载，利用 Docker 缓存层
 COPY go.mod go.sum ./
 RUN go mod download

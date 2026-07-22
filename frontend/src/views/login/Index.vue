@@ -38,10 +38,10 @@ async function handleLogin() {
 </script>
 
 <template>
-  <div class="login-container">
-    <el-card class="login-card">
-      <h2>Cybertron Portal</h2>
-      <p class="subtitle">运维管理平台</p>
+  <div class="login-container tech-grid-bg">
+    <el-card class="login-card tech-card-glow">
+      <h2 class="tech-title">CYBERTRON PORTAL</h2>
+      <p class="subtitle">运 维 管 理 平 台</p>
       <el-form ref="formRef" :model="form" :rules="rules" @keyup.enter="handleLogin">
         <el-form-item prop="username">
           <el-input v-model="form.username" placeholder="用户名" :prefix-icon="User" />
@@ -57,7 +57,7 @@ async function handleLogin() {
         </el-form-item>
         <el-form-item>
           <el-button type="primary" style="width: 100%" :loading="loading" @click="handleLogin">
-            登录
+            登 录
           </el-button>
         </el-form-item>
       </el-form>
@@ -72,23 +72,30 @@ export default { components: { User, Lock } }
 
 <style scoped>
 .login-container {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: #f0f2f5;
+  overflow: hidden;
 }
 .login-card {
-  width: 400px;
+  position: relative;
+  z-index: 1;
+  width: 420px;
+  padding: 12px 8px;
 }
 .login-card h2 {
   text-align: center;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  font-size: 26px;
+  font-weight: 700;
 }
 .subtitle {
   text-align: center;
-  color: #999;
-  margin-bottom: 24px;
-  font-size: 14px;
+  color: var(--tech-text-dim);
+  margin-bottom: 28px;
+  font-size: 13px;
+  letter-spacing: 6px;
 }
 </style>

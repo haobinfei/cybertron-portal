@@ -1,0 +1,189 @@
+/* ============================================
+   Cybertron Portal 科技感主题
+   基于 Element Plus dark 主题，覆盖为霓虹青/紫配色
+   ============================================ */
+
+:root {
+  /* 科技色板 */
+  --tech-bg-deep: #050914;
+  --tech-bg-base: #0a0e27;
+  --tech-bg-card: rgba(15, 23, 42, 0.72);
+  --tech-bg-hover: rgba(30, 41, 59, 0.6);
+  --tech-primary: #00f0ff;
+  --tech-primary-dim: rgba(0, 240, 255, 0.15);
+  --tech-accent: #7c3aed;
+  --tech-accent-dim: rgba(124, 58, 237, 0.15);
+  --tech-border: rgba(0, 240, 255, 0.18);
+  --tech-border-strong: rgba(0, 240, 255, 0.45);
+  --tech-text: #e2e8f0;
+  --tech-text-dim: #94a3b8;
+  --tech-glow: 0 0 12px rgba(0, 240, 255, 0.35);
+}
+
+html.dark {
+  /* Element Plus 变量覆盖 */
+  --el-color-primary: #00c8dd;
+  --el-color-primary-light-3: #33d9ec;
+  --el-color-primary-light-5: #66e4f1;
+  --el-color-primary-light-7: #99eef7;
+  --el-color-primary-light-8: #b3f3f9;
+  --el-color-primary-light-9: rgba(0, 240, 255, 0.12);
+  --el-color-primary-dark-2: #00a7c0;
+
+  --el-bg-color: #0a0e27;
+  --el-bg-color-page: #050914;
+  --el-bg-color-overlay: #101632;
+
+  --el-text-color-primary: #e2e8f0;
+  --el-text-color-regular: #cbd5e1;
+  --el-text-color-secondary: #94a3b8;
+  --el-text-color-placeholder: #64748b;
+
+  --el-border-color: rgba(148, 163, 184, 0.25);
+  --el-border-color-light: rgba(148, 163, 184, 0.18);
+  --el-border-color-lighter: rgba(148, 163, 184, 0.12);
+  --el-border-color-extra-light: rgba(148, 163, 184, 0.08);
+
+  --el-fill-color: rgba(30, 41, 59, 0.5);
+  --el-fill-color-light: rgba(30, 41, 59, 0.35);
+  --el-fill-color-lighter: rgba(30, 41, 59, 0.22);
+  --el-fill-color-blank: transparent;
+
+  --el-mask-color: rgba(5, 9, 20, 0.75);
+}
+
+/* ============================================
+   全局基础
+   ============================================ */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--tech-bg-deep);
+  color: var(--tech-text);
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+}
+
+#app {
+  height: 100vh;
+}
+
+/* ============================================
+   玻璃态卡片
+   ============================================ */
+
+.tech-card {
+  background: var(--tech-bg-card);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--tech-border);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.tech-card-glow {
+  border-color: var(--tech-border-strong);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), var(--tech-glow);
+}
+
+/* ============================================
+   霓虹文字
+   ============================================ */
+
+.tech-title {
+  background: linear-gradient(90deg, var(--tech-primary), var(--tech-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  letter-spacing: 2px;
+}
+
+.tech-glow-text {
+  color: var(--tech-primary);
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+}
+
+/* ============================================
+   网格背景（用于登录页 / 404）
+   ============================================ */
+
+.tech-grid-bg {
+  background-color: var(--tech-bg-deep);
+  background-image:
+    linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.tech-grid-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0, 240, 255, 0.12), transparent),
+    radial-gradient(ellipse 50% 40% at 80% 100%, rgba(124, 58, 237, 0.12), transparent);
+  pointer-events: none;
+}
+
+/* ============================================
+   Element Plus 组件细节覆盖
+   ============================================ */
+
+/* 表格 */
+.el-table {
+  --el-table-bg-color: transparent;
+  --el-table-tr-bg-color: transparent;
+  --el-table-header-bg-color: rgba(15, 23, 42, 0.8);
+  --el-table-row-hover-bg-color: rgba(0, 240, 255, 0.06);
+  --el-table-border-color: var(--tech-border);
+  --el-table-header-text-color: var(--tech-text);
+  --el-table-text-color: var(--tech-text-dim);
+}
+
+/* 卡片 */
+.el-card {
+  --el-card-bg-color: var(--tech-bg-card);
+  --el-card-border-color: var(--tech-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* 对话框 */
+.el-dialog {
+  --el-dialog-bg-color: #101632;
+  border: 1px solid var(--tech-border);
+  border-radius: 10px;
+}
+
+/* 主按钮加发光 */
+.el-button--primary {
+  --el-button-bg-color: rgba(0, 200, 221, 0.18);
+  --el-button-border-color: var(--tech-border-strong);
+  --el-button-text-color: var(--tech-primary);
+  --el-button-hover-bg-color: rgba(0, 200, 221, 0.32);
+  --el-button-hover-border-color: var(--tech-primary);
+  --el-button-hover-text-color: #ffffff;
+  --el-button-active-bg-color: rgba(0, 200, 221, 0.4);
+}
+
+.el-button--primary:hover {
+  box-shadow: var(--tech-glow);
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.2);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.4);
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}

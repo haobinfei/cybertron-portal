@@ -155,6 +155,8 @@ export default { components: { Plus } }
 }
 .toolbar h3 {
   margin: 0;
+  color: var(--tech-text);
+  font-weight: 600;
 }
 .pagination {
   display: flex;

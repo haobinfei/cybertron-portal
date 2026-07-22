@@ -49,17 +49,26 @@ export default { components: { Expand, Fold } }
   justify-content: space-between;
   height: 100%;
   padding: 0 16px;
-  background: #fff;
-  border-bottom: 1px solid #e6e6e6;
+  background: var(--tech-bg-card);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--tech-border);
 }
 .collapse-btn {
   font-size: 20px;
   cursor: pointer;
+  color: var(--tech-text-dim);
+  transition: color 0.2s;
+}
+.collapse-btn:hover {
+  color: var(--tech-primary);
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
 }
 .user-info {
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
+  color: var(--tech-text);
 }
 </style>

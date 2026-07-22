@@ -37,8 +37,17 @@ export default {
 <style scoped>
 .layout-container {
   height: 100vh;
+  background-color: var(--tech-bg-deep);
 }
 .el-header {
   padding: 0;
+}
+.el-aside {
+  transition: width 0.2s;
+}
+.el-main {
+  background:
+    radial-gradient(ellipse 50% 40% at 20% 0%, rgba(0, 240, 255, 0.04), transparent),
+    var(--tech-bg-deep);
 }
 </style>

@@ -1,0 +1,4 @@
+# 本地构建时下载的二进制文件，勿提交
+buildx-*
+kubectl
+helm

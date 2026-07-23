@@ -127,13 +127,13 @@ jobs:
           # cache-to: type=gha,mode=max
 
   # ------------------------------
-  # Helm Chart 打包与推送
+  # Helm Chart 打包与推送（仅 tag 触发时执行）
   # ------------------------------
   package-helm-chart:
     name: Package and Push Helm Chart
     runs-on: self-hosted
     needs: [build-backend, build-frontend]
-    if: github.event_name != 'pull_request'
+    if: github.ref_type == 'tag'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -148,14 +148,9 @@ jobs:
       - name: Determine chart version
         id: chart
         run: |
-          if [[ "${{ github.ref_type }}" == "tag" ]]; then
-            # tag: v1.2.3 -> 1.2.3
-            VERSION="${{ github.ref_name }}"
-            VERSION="${VERSION#v}"
-          else
-            # branch: use 8-char commit sha
-            VERSION="${GITHUB_SHA:0:8}"
-          fi
+          # tag: v1.2.3 -> 1.2.3
+          VERSION="${{ github.ref_name }}"
+          VERSION="${VERSION#v}"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Package Helm Chart

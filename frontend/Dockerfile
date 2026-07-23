@@ -2,7 +2,7 @@
 # 多阶段构建：先编译 Vue/Vite 前端，再用 nginx 托管
 
 # 阶段 1：编译
-FROM registry.cn-hangzhou.aliyuncs.com/ss-vip/node:20-alpine AS builder
+FROM registry.cn-hangzhou.aliyuncs.com/ss-vip/node:24-alpine AS builder
 
 WORKDIR /app
 

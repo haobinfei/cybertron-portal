@@ -22,7 +22,7 @@ env:
   BACKEND_IMAGE: cybertron-portal-backend
   FRONTEND_IMAGE: cybertron-portal-frontend
   # Helm Chart 仓库地址
-  HELM_REPO_URL: http://package.ss-vip.cn/repository/helm
+  HELM_REPO_URL: https://package.ss-vip.cn/repository/helm
   # Helm Chart 名称与路径
   HELM_CHART_NAME: cybertron-portal
   HELM_CHART_PATH: deploy/helm/cybertron-portal
